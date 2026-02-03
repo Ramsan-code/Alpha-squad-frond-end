@@ -45,7 +45,5 @@ next-env.d.ts
 cloudinary_config.js
 jwtPrivateKey.pem
 mongoURI.pem
-mongodb.ts
+
 uploads/
-cloudinary.ts
-jwt.ts
