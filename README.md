@@ -20,7 +20,7 @@
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **Framework**: Next.js 15.5.7 (App Router)
+- **Framework**: Next.js 16.1.6 (App Router)
 - **UI Library**: React 19.2.0
 - **Styling**: Tailwind CSS 4.0
 - **Components**: Radix UI, shadcn/ui
@@ -28,7 +28,7 @@
 - **Forms**: React Hook Form + Zod validation
 
 ### Backend
-- **Runtime**: Node.js
+- **Runtime**: Node.js 24
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT (jsonwebtoken)
 - **Password Hashing**: bcryptjs

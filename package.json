@@ -4,6 +4,9 @@
   "private": true,
   "description": "**Alpha.LMS** is a next-generation Learning Management System built with cutting-edge technologies, featuring AI-powered lesson planning, automated grading, and comprehensive role-based dashboards.",
   "license": "ISC",
+  "engines": {
+    "node": "24"
+  },
   "author": "",
   "type": "module",
   "main": "index.js",
@@ -54,7 +57,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.554.0",
     "mongoose": "^9.1.5",
-    "next": "^15.5.11",
+    "next": "16.1.6",
     "next-cloudinary": "^6.17.5",
     "next-themes": "^0.4.6",
     "orchids-visual-edits": "^1.0.12",
@@ -73,7 +76,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
