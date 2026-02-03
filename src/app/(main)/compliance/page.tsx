@@ -7,7 +7,6 @@ import {
     CheckCircle2,
     History,
     ShieldAlert,
-    Timer,
     ExternalLink,
     Download,
     Play,
@@ -16,7 +15,6 @@ import {
     FileText,
     Shield,
     RefreshCw,
-    ChevronRight,
     Lock
 } from "lucide-react"
 import {
@@ -248,7 +246,7 @@ export default function CompliancePage() {
                                     <Progress value={course.progress} className="h-2 bg-white/5">
                                         <div
                                             className={`h-full rounded-full transition-all ${course.status === 'Completed' ? 'bg-green-500' :
-                                                    course.critical ? 'bg-gradient-to-r from-red-500 to-amber-500' : 'bg-accent-vibrant'
+                                                course.critical ? 'bg-gradient-to-r from-red-500 to-amber-500' : 'bg-accent-vibrant'
                                                 }`}
                                             style={{ width: `${course.progress}%` }}
                                         />

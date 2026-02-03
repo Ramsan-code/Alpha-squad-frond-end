@@ -8,11 +8,6 @@ import {
     Tooltip,
     XAxis,
     YAxis,
-    Cell,
-    PieChart,
-    Pie,
-    LineChart,
-    Line,
     CartesianGrid,
     AreaChart,
     Area
@@ -20,18 +15,14 @@ import {
 import {
     Activity,
     ArrowUpRight,
-    ArrowDownRight,
     Download,
-    PieChart as PieChartIcon,
     TrendingUp,
     Users,
     CheckCircle2,
     ShieldCheck,
     Star,
-    Zap,
     Clock,
     Target,
-    Calendar,
     Award,
     BookOpen,
     Flame
@@ -45,7 +36,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/components/auth/auth-provider"
 
@@ -87,7 +78,7 @@ const achievements = [
 export default function AnalyticsPage() {
     const { user } = useAuth();
     const [mounted, setMounted] = React.useState(false);
-    const [timeRange, setTimeRange] = React.useState("week");
+    const [, setTimeRange] = React.useState("week");
 
     React.useEffect(() => {
         setMounted(true);

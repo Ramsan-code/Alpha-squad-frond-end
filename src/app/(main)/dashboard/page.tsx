@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { BookOpen, Clock, TrendingUp, Award, Target, Zap, Play, ChevronRight, Flame, Star, Bell, Calendar, ArrowRight, Sparkles, Bot } from "lucide-react"
+import { BookOpen, Clock, Award, Target, Play, ChevronRight, Flame, Star, Bell, Calendar, ArrowRight, Sparkles, Bot } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -223,8 +223,8 @@ export default function StudentDashboard() {
                                             <p className="text-[10px] text-muted-foreground">{assignment.course}</p>
                                         </div>
                                         <Badge className={`shrink-0 text-[8px] ${assignment.priority === 'high'
-                                                ? 'bg-red-500/10 text-red-500'
-                                                : 'bg-amber-500/10 text-amber-500'
+                                            ? 'bg-red-500/10 text-red-500'
+                                            : 'bg-amber-500/10 text-amber-500'
                                             }`}>
                                             {assignment.daysLeft}d left
                                         </Badge>

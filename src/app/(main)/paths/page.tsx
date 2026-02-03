@@ -170,15 +170,15 @@ export default function LearningPathsPage() {
                             <div className="relative">
                                 <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-white/10" />
                                 <div className="space-y-4">
-                                    {path.modules.map((module, idx) => (
+                                    {path.modules.map((module) => (
                                         <div key={module.name} className="relative flex items-start gap-6 pl-10">
                                             <div className={`absolute left-0 top-1 h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all ${module.status === 'completed'
-                                                    ? 'border-green-500 bg-green-500/10'
-                                                    : module.status === 'active'
-                                                        ? 'border-accent-vibrant bg-accent-vibrant/10 animate-pulse shadow-[0_0_15px_rgba(124,58,237,0.5)]'
-                                                        : module.status === 'pending'
-                                                            ? 'border-white/20 bg-white/5'
-                                                            : 'border-white/10 bg-black'
+                                                ? 'border-green-500 bg-green-500/10'
+                                                : module.status === 'active'
+                                                    ? 'border-accent-vibrant bg-accent-vibrant/10 animate-pulse shadow-[0_0_15px_rgba(124,58,237,0.5)]'
+                                                    : module.status === 'pending'
+                                                        ? 'border-white/20 bg-white/5'
+                                                        : 'border-white/10 bg-black'
                                                 }`}>
                                                 {module.status === 'completed'
                                                     ? <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -190,10 +190,10 @@ export default function LearningPathsPage() {
                                                 }
                                             </div>
                                             <div className={`flex-1 p-4 rounded-xl border transition-all ${module.status === 'active'
-                                                    ? 'border-accent-vibrant/30 bg-accent-vibrant/5 shadow-[0_0_20px_rgba(124,58,237,0.1)]'
-                                                    : module.status === 'locked'
-                                                        ? 'border-white/5 bg-white/[0.01] opacity-50'
-                                                        : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'
+                                                ? 'border-accent-vibrant/30 bg-accent-vibrant/5 shadow-[0_0_20px_rgba(124,58,237,0.1)]'
+                                                : module.status === 'locked'
+                                                    ? 'border-white/5 bg-white/[0.01] opacity-50'
+                                                    : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'
                                                 } ${module.status !== 'locked' ? 'cursor-pointer' : ''}`}>
                                                 <div className="flex items-center justify-between gap-4">
                                                     <div className="flex-1">
