@@ -9,7 +9,7 @@ const forgotPasswordSchema = z.object({
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const validated = forgotPasswordSchema.parse(body);
+        forgotPasswordSchema.parse(body);
 
         // In a real app, you would:
         // 1. Find user by email

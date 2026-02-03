@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Zap, Brain, Sparkles, MessageSquare, TrendingUp, Lightbulb, Target, BookOpen, Clock, ArrowRight, RefreshCw, ThumbsUp, ThumbsDown, Send, Bot, User } from "lucide-react";
+import { Zap, Brain, Sparkles, TrendingUp, Lightbulb, Target, Clock, ArrowRight, RefreshCw, ThumbsUp, ThumbsDown, Send, Bot, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -212,8 +212,8 @@ export default function AIInsightsPage() {
                                     )}
                                 </div>
                                 <div className={`max-w-[80%] p-3 rounded-2xl ${msg.role === 'assistant'
-                                        ? 'bg-white/5 rounded-tl-sm'
-                                        : 'bg-accent-cyan/10 rounded-tr-sm'
+                                    ? 'bg-white/5 rounded-tl-sm'
+                                    : 'bg-accent-cyan/10 rounded-tr-sm'
                                     }`}>
                                     <p className="text-sm leading-relaxed">{msg.content}</p>
                                 </div>

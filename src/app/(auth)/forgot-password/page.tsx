@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -31,7 +31,7 @@ type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 export default function ForgotPasswordPage() {
     const [isLoading, setIsLoading] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
-    const router = useRouter()
+
 
     const form = useForm<ForgotPasswordValues>({
         resolver: zodResolver(forgotPasswordSchema),

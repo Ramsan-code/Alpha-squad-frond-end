@@ -7,8 +7,7 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    LineChart,
-    Line,
+
     Cell,
     PieChart,
     Pie,
@@ -19,11 +18,10 @@ import {
     TrendingUp,
     DollarSign,
     Users,
-    CreditCard,
-    ArrowUpRight,
+
     ArrowDownRight,
     Download,
-    Filter,
+
     ShieldCheck,
     Calendar,
     Sparkles

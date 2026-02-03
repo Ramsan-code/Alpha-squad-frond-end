@@ -133,7 +133,7 @@ export function LessonPlanner() {
                                         variant="outline"
                                         size="sm"
                                         className={`h-10 capitalize transition-all ${formData.style === s ? 'bg-accent-vibrant text-white border-accent-vibrant' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
-                                        onClick={() => setFormData({ ...formData, style: s as any })}
+                                        onClick={() => setFormData({ ...formData, style: s as "interactive" | "lecture" | "lab" })}
                                     >
                                         {s}
                                     </Button>
