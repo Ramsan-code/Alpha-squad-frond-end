@@ -1,5 +1,7 @@
-export type UserRole = "STUDENT" | "INSTRUCTOR" | "ADMIN" | "PARENT";
+// User role types matching backend
+export type UserRole = "STUDENT" | "INSTRUCTOR" | "PARENT" | "ADMIN";
 
+// User type matching backend User model
 export interface User {
     id: string;
     name: string;
@@ -7,14 +9,6 @@ export interface User {
     role: UserRole;
     avatar?: string;
     bio?: string;
-    enrolledCourses?: string[];
-    createdCourses?: string[];
-    permissions?: string[];
-}
-
-export interface AuthState {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    error: string | null;
+    createdAt?: string;
+    updatedAt?: string;
 }

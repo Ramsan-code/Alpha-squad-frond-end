@@ -3,102 +3,65 @@
 import * as React from "react"
 import { User, UserRole } from "@/types/user"
 import { useRouter } from "next/navigation"
+import { authService } from "@/lib/services/auth.service"
+import { toast } from "sonner"
 
 interface AuthContextType {
     user: User | null;
     role: UserRole | null;
     isAuthenticated: boolean;
-    login: (email: string, password: string, remember?: boolean, roleHint?: UserRole) => Promise<void>;
+    token: string | null;
+    login: (email: string, password: string, remember?: boolean) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
 }
 
 const AuthContext = React.createContext<AuthContextType | null>(null);
 
+const TOKEN_KEY = "lms_token";
+const USER_KEY = "lms_user";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = React.useState<User | null>(null);
+    const [token, setToken] = React.useState<string | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const router = useRouter();
 
-    // Load user from storage on mount
+    // Load user and token from storage on mount
     React.useEffect(() => {
-        const storedUser = localStorage.getItem("lms_user") || sessionStorage.getItem("lms_user");
-        if (storedUser) {
+        const storedToken = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+        const storedUser = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
+
+        if (storedToken && storedUser) {
+            setToken(storedToken);
             setUser(JSON.parse(storedUser));
         }
         setIsLoading(false);
     }, []);
 
-    const login = async (email: string, password: string, remember: boolean = false, roleHint?: UserRole) => {
-        // We don't set global isLoading=true here to avoid unmounting the whole app/login form
-        // The LoginForm will handle its own local loading state for the button
-
+    const login = async (email: string, password: string, remember: boolean = false) => {
         try {
-            // First try real API
-            let userData;
-            try {
-                const response = await fetch("/api/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password }),
-                });
+            // Call backend API
+            const response = await authService.login(email, password);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    userData = data.user;
-                }
-            } catch (apiErr) {
-                console.warn("API login failed, falling back to persona data", apiErr);
+            if (!response.success || !response.data) {
+                throw new Error(response.message || "Login failed");
             }
 
-            // Fallback to "Real" User Personas if API fails or for demo purposes
-            if (!userData) {
-                // Use roleHint from LoginForm, or infer from email as fallback
-                const role: UserRole = roleHint || (
-                    email.includes("instructor") || email.includes("teacher") ? "INSTRUCTOR" :
-                        email.includes("parent") ? "PARENT" :
-                            email.includes("admin") ? "ADMIN" : "STUDENT"
-                );
+            const { user: userData, token: authToken } = response.data;
 
-                const userPersonas: Record<UserRole, Partial<User>> = {
-                    STUDENT: {
-                        name: "Alex Rivera",
-                        bio: "Full-stack developer looking to master AI integration.",
-                        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=60"
-                    },
-                    INSTRUCTOR: {
-                        name: "Dr. Sarah Chen",
-                        bio: "Lead Instructor with 15+ years of industry experience in Cloud Architecture.",
-                        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=60"
-                    },
-                    ADMIN: {
-                        name: "Mark Johnson",
-                        bio: "Systems Administrator and Compliance Officer.",
-                        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=60"
-                    },
-                    PARENT: {
-                        name: "Linda Rivera",
-                        bio: "Parent of Alex Rivera. Monitoring educational progress.",
-                        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=60"
-                    }
-                };
-
-                const persona = userPersonas[role];
-                userData = {
-                    id: role === "STUDENT" ? "stu_01" : role === "INSTRUCTOR" ? "ins_01" : role === "ADMIN" ? "adm_01" : "par_01",
-                    name: persona.name || email.split("@")[0],
-                    email: email,
-                    role: role,
-                    avatar: persona.avatar,
-                    bio: persona.bio,
-                };
-            }
-
+            // Store user and token
             setUser(userData);
-            const storage = remember ? localStorage : sessionStorage;
-            storage.setItem("lms_user", JSON.stringify(userData));
+            setToken(authToken);
 
-            // Navigation happens smoothly via router.push
+            const storage = remember ? localStorage : sessionStorage;
+            storage.setItem(USER_KEY, JSON.stringify(userData));
+            storage.setItem(TOKEN_KEY, authToken);
+
+            // Show success message
+            toast.success(`Welcome back, ${userData.name}!`);
+
+            // Navigate based on role
             const role = userData.role;
             if (role === "INSTRUCTOR") {
                 router.push("/teach/dashboard");
@@ -110,15 +73,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 router.push("/dashboard");
             }
         } catch (error: unknown) {
-            console.error("Login fatal error:", error);
+            console.error("Login error:", error);
+            const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again.";
+            toast.error(errorMessage);
             throw error;
         }
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem("lms_user");
-        sessionStorage.removeItem("lms_user");
+        setToken(null);
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        toast.info("You have been logged out");
         router.push("/");
     };
 
@@ -127,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             user,
             role: user?.role || null,
             isAuthenticated: !!user,
+            token,
             login,
             logout,
             isLoading

@@ -9,15 +9,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UserRole } from "@/types/user"
 import { Loader2, Mail, Lock } from "lucide-react"
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
 
+
 export function LoginForm() {
     const { login } = useAuth();
-    const [role, setRole] = React.useState<UserRole>("STUDENT");
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [remember, setRemember] = React.useState(false);
 
@@ -32,8 +30,7 @@ export function LoginForm() {
     const onSubmit = async (data: LoginInput) => {
         setIsSubmitting(true);
         try {
-            // Pass the selected role from the tabs to the login function
-            await login(data.email, data.password, remember, role);
+            await login(data.email, data.password, remember);
         } catch (err) {
             console.error(err);
         } finally {
@@ -50,17 +47,6 @@ export function LoginForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Log in as</Label>
-                    <Tabs defaultValue="STUDENT" onValueChange={(v) => setRole(v as UserRole)} className="w-full">
-                        <TabsList className="grid w-full grid-cols-4 bg-white/5 p-1">
-                            <TabsTrigger value="STUDENT" className="data-[state=active]:bg-accent-vibrant text-[10px]">Student</TabsTrigger>
-                            <TabsTrigger value="INSTRUCTOR" className="data-[state=active]:bg-accent-cyan text-[10px] text-white!">Instructor</TabsTrigger>
-                            <TabsTrigger value="PARENT" className="data-[state=active]:bg-pink-500 text-[10px] text-white!">Parent</TabsTrigger>
-                            <TabsTrigger value="ADMIN" className="data-[state=active]:bg-amber-500 text-[10px] text-white!">Admin</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>

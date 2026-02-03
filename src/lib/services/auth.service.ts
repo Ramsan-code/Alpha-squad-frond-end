@@ -1,0 +1,82 @@
+import { api, ApiResponse } from "@/lib/api-client";
+import { User, UserRole } from "@/types/user";
+
+// DTO types matching backend response structure
+export type LoginResponse = ApiResponse<{
+    user: User;
+    token: string;
+}>;
+
+export type RegisterResponse = ApiResponse<{
+    user: User;
+    token: string;
+}>;
+
+export type MeResponse = ApiResponse<{
+    user: User;
+}>;
+
+// Auth service - all backend communication for authentication
+export const authService = {
+    /**
+     * Login user with email and password
+     */
+    async login(email: string, password: string): Promise<LoginResponse> {
+        return api.post<LoginResponse>("/auth/login", {
+            email,
+            password,
+        });
+    },
+
+    /**
+     * Register a new student
+     */
+    async registerStudent(
+        email: string,
+        password: string,
+        name?: string
+    ): Promise<RegisterResponse> {
+        return api.post<RegisterResponse>("/auth/register/student", {
+            email,
+            password,
+            name,
+        });
+    },
+
+    /**
+     * Register a new teacher
+     */
+    async registerTeacher(
+        email: string,
+        password: string,
+        name?: string
+    ): Promise<RegisterResponse> {
+        return api.post<RegisterResponse>("/auth/register/teacher", {
+            email,
+            password,
+            name,
+        });
+    },
+
+    /**
+     * Register a new review user
+     */
+    async registerReview(
+        email: string,
+        password: string,
+        name?: string
+    ): Promise<RegisterResponse> {
+        return api.post<RegisterResponse>("/auth/register/review", {
+            email,
+            password,
+            name,
+        });
+    },
+
+    /**
+     * Get current user profile (requires auth token)
+     */
+    async getMe(token: string): Promise<MeResponse> {
+        return api.get<MeResponse>("/auth/me");
+    },
+};
