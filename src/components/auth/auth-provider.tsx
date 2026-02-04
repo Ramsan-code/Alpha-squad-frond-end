@@ -48,14 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 throw new Error(response.message || "Login failed");
             }
 
-            const { user: userData, token: authToken } = response.data;
+            const { user: userData, profile: profileData, token: authToken } = response.data;
+            const userWithProfile = { ...userData, profile: profileData };
 
             // Store user and token
-            setUser(userData);
+            setUser(userWithProfile);
             setToken(authToken);
 
             const storage = remember ? localStorage : sessionStorage;
-            storage.setItem(USER_KEY, JSON.stringify(userData));
+            storage.setItem(USER_KEY, JSON.stringify(userWithProfile));
             storage.setItem(TOKEN_KEY, authToken);
 
             // Show success message

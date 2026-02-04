@@ -5,48 +5,45 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import Image from "next/image"
+import * as React from "react"
+import { useAuth } from "@/components/auth/auth-provider"
 
 export default function TeacherDashboard() {
-    // Mock data - replace with real data from API
-    const stats = {
-        totalRevenue: 24580,
-        totalStudents: 1247,
-        activeCourses: 12,
-        avgRating: 4.8,
-    }
+    const { user } = useAuth();
 
-    const courses = [
-        {
-            id: 1,
-            title: "Advanced React Patterns",
-            students: 342,
-            revenue: 8540,
-            rating: 4.9,
-            reviews: 87,
-            published: true,
-            thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop",
-        },
-        {
-            id: 2,
-            title: "Machine Learning Fundamentals",
-            students: 518,
-            revenue: 12950,
-            rating: 4.7,
-            reviews: 124,
-            published: true,
-            thumbnail: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=200&fit=crop",
-        },
-        {
-            id: 3,
-            title: "TypeScript Masterclass",
-            students: 0,
-            revenue: 0,
-            rating: 0,
-            reviews: 0,
-            published: false,
-            thumbnail: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=200&fit=crop",
-        },
-    ]
+    // Map backend data to dashboard format
+    const dashboardData = React.useMemo(() => {
+        if (!user?.profile?.coursesCreated) {
+            return { stats: { totalRevenue: 0, totalStudents: 0, activeCourses: 0, avgRating: 0 }, teacherCourses: [] };
+        }
+
+        const created = user.profile.coursesCreated;
+        const mappedCourses = created.map((course: any) => {
+            const studentCount = course.enrolledStudents?.length || 0;
+            return {
+                id: course._id,
+                title: course.title,
+                students: studentCount,
+                revenue: (course.price || 0) * studentCount,
+                rating: 4.8, // Dummy
+                reviews: 12, // Dummy
+                published: course.status === "approved",
+                thumbnail: course.thumbnail || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop",
+            };
+        });
+
+        return {
+            stats: {
+                totalRevenue: mappedCourses.reduce((acc: number, curr: any) => acc + curr.revenue, 0),
+                totalStudents: mappedCourses.reduce((acc: number, curr: any) => acc + curr.students, 0),
+                activeCourses: mappedCourses.filter((c: any) => c.published).length,
+                avgRating: 4.8,
+            },
+            teacherCourses: mappedCourses
+        };
+    }, [user]);
+
+    const { stats, teacherCourses } = dashboardData;
 
     const recentActivity = [
         { id: 1, student: "John Doe", action: "completed", course: "Advanced React Patterns", time: "2 hours ago" },
@@ -140,7 +137,7 @@ export default function TeacherDashboard() {
 
                 <TabsContent value="all" className="space-y-4">
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {courses.map((course) => (
+                        {teacherCourses.map((course: any) => (
                             <Card key={course.id} className="glass border-white/10 overflow-hidden group hover:border-accent-vibrant/50 transition-all">
                                 <div className="aspect-video w-full overflow-hidden bg-muted relative">
                                     <Image

@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   BookOpen,
+  Search,
   LayoutDashboard,
   LineChart,
   ShieldCheck,
@@ -28,8 +29,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 
-
-
 import { useAuth } from "@/components/auth/auth-provider"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -46,14 +45,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: role === "INSTRUCTOR" ? [
       { title: "Studio Home", url: "/teach/dashboard", icon: LayoutDashboard },
       { title: "My Courses", url: "/teach/courses", icon: BookOpen },
+      { title: "Explore Catalog", url: "/search", icon: Search },
       { title: "Student Analytics", url: "/analytics", icon: LineChart },
     ] : role === "PARENT" ? [
       { title: "Parent Home", url: "/parent/dashboard", icon: LayoutDashboard },
       { title: "Student Reports", url: "/parent/reports", icon: BookOpen },
+      { title: "Explore Catalog", url: "/search", icon: Search },
       { title: "Subscription", url: "/parent/subscription", icon: ShieldCheck },
     ] : [
-      { title: "Home", url: "/", icon: LayoutDashboard },
-      { title: "Dashboard", url: "/dashboard", icon: TrendingUp },
+      { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+      { title: "Explore Catalog", url: "/search", icon: Search },
       { title: "My Courses", url: "/courses", icon: BookOpen },
     ],
     insights: role === "INSTRUCTOR" ? [

@@ -12,89 +12,51 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
 
-const enrolledCourses = [
-    {
-        id: "1",
-        title: "Advanced React Patterns & Performance",
-        instructor: "Dr. Sarah Chen",
-        instructorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
-        progress: 68,
-        lastAccessed: "2 hours ago",
-        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60",
-        rating: 4.9,
-        totalLessons: 42,
-        completedLessons: 28,
-        duration: "12h 30m",
-        category: "Development",
-        nextLesson: "Custom Hooks Deep Dive",
-        certified: true,
-    },
-    {
-        id: "2",
-        title: "Next.js 15 Deep Dive: App Router Mastery",
-        instructor: "Lee Robinson",
-        instructorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-        progress: 45,
-        lastAccessed: "Yesterday",
-        image: "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&auto=format&fit=crop&q=60",
-        rating: 4.8,
-        totalLessons: 38,
-        completedLessons: 17,
-        duration: "10h 15m",
-        category: "Development",
-        nextLesson: "Server Actions in Production",
-        certified: true,
-    },
-    {
-        id: "3",
-        title: "AI Integration for SaaS Applications",
-        instructor: "Anna Kumar",
-        instructorAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100",
-        progress: 22,
-        lastAccessed: "3 days ago",
-        image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=60",
-        rating: 4.95,
-        totalLessons: 56,
-        completedLessons: 12,
-        duration: "18h 45m",
-        category: "AI/ML",
-        nextLesson: "Building RAG Systems",
-        certified: false,
-    },
-    {
-        id: "4",
-        title: "Enterprise Cloud Architecture",
-        instructor: "Michael Torres",
-        instructorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-        progress: 100,
-        lastAccessed: "Last week",
-        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=60",
-        rating: 4.7,
-        totalLessons: 30,
-        completedLessons: 30,
-        duration: "8h 20m",
-        category: "Cloud",
-        nextLesson: null,
-        certified: true,
-    },
-];
+// No mock data needed anymore, using real data from useAuth()
 
 export default function MyCoursesPage() {
     const { user } = useAuth();
     const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
     const [filter, setFilter] = React.useState("all");
 
+    // Map backend enrolled courses to UI format
+    const courses = React.useMemo(() => {
+        if (!user?.profile?.enrolledCourses) return [];
+
+        return user.profile.enrolledCourses.map((enrollment: any) => {
+            const course = enrollment.courseId;
+            if (!course) return null;
+
+            return {
+                id: course._id,
+                title: course.title,
+                instructor: course.author || "Global Instructor",
+                instructorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(course.author || "GI")}&background=random`,
+                progress: enrollment.progress || 0,
+                lastAccessed: new Date(enrollment.lastAccessed).toLocaleDateString(),
+                image: course.thumbnail || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60",
+                rating: 4.5, // Default for now
+                totalLessons: course.syllabus?.length * 5 || 20, // Estimated
+                completedLessons: Math.floor(((enrollment.progress || 0) / 100) * (course.syllabus?.length * 5 || 20)),
+                duration: `${course.duration || 10}h`,
+                category: course.category || "General",
+                nextLesson: enrollment.progress < 100 ? "Continue Learning" : null,
+                certified: enrollment.progress === 100,
+            };
+        }).filter(Boolean);
+    }, [user]);
+
     const filteredCourses = filter === "all"
-        ? enrolledCourses
+        ? courses
         : filter === "inProgress"
-            ? enrolledCourses.filter(c => c.progress > 0 && c.progress < 100)
-            : enrolledCourses.filter(c => c.progress === 100);
+            ? courses.filter((c: any) => c.progress > 0 && c.progress < 100)
+            : courses.filter((c: any) => c.progress === 100);
 
     const stats = {
-        totalCourses: enrolledCourses.length,
-        inProgress: enrolledCourses.filter(c => c.progress > 0 && c.progress < 100).length,
-        completed: enrolledCourses.filter(c => c.progress === 100).length,
-        totalHours: "49h 50m",
+        totalCourses: courses.length,
+        inProgress: courses.filter((c: any) => c.progress > 0 && c.progress < 100).length,
+        completed: courses.filter((c: any) => c.progress === 100).length,
+        totalHours: `${courses.reduce((acc: number, curr: any) => acc + parseInt(curr.duration), 0)}h`,
     };
 
     return (
@@ -173,7 +135,7 @@ export default function MyCoursesPage() {
 
             {/* Courses Grid/List */}
             <div className={viewMode === "grid" ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-4"}>
-                {filteredCourses.map((course) => (
+                {filteredCourses.map((course: any) => (
                     viewMode === "grid" ? (
                         <Card key={course.id} className="glass border-none overflow-hidden group hover:-translate-y-1 transition-all duration-300">
                             <div className="relative h-36 overflow-hidden">

@@ -22,16 +22,58 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import { coursesService } from "@/lib/services/courses.service"
+import { toast } from "sonner"
 
 export default function CoursePlayerPage() {
+    const params = useParams();
+    const router = useRouter();
     const [currentLesson, setCurrentLesson] = React.useState(1)
+    const [course, setCourse] = React.useState<any>(null)
+    const [isLoading, setIsLoading] = React.useState(true)
 
-    const lessons = [
-        { id: 1, title: "Introduction to Next.js 15", duration: "10:30", type: "video", completed: true },
-        { id: 2, title: "Server Actions and Form Handling", duration: "25:45", type: "video", completed: false },
-        { id: 3, title: "Mastering Middleware", duration: "15:20", type: "video", completed: false },
-        { id: 4, title: "Architecture Case Study", duration: "5:00", type: "read", completed: false },
-    ]
+    React.useEffect(() => {
+        const fetchCourse = async () => {
+            if (!params.id) return;
+            try {
+                const response = await coursesService.getCourse(params.id as string);
+                if (response.success && response.data) {
+                    setCourse(response.data.course);
+                } else {
+                    toast.error("Course not found");
+                    router.push("/dashboard");
+                }
+            } catch (err) {
+                console.error(err);
+                toast.error("Failed to load course");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCourse();
+    }, [params.id, router]);
+
+    const lessons = React.useMemo(() => {
+        if (!course?.syllabus) return [];
+        return course.syllabus.map((module: any, idx: number) => ({
+            id: idx + 1,
+            title: module.module,
+            duration: `${module.duration || 10}:00`,
+            type: "video",
+            completed: false, // Progress not tracked at lesson level yet
+        }));
+    }, [course]);
+
+    if (isLoading) {
+        return (
+            <div className="h-screen bg-black flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-vibrant"></div>
+            </div>
+        );
+    }
+
+    if (!course) return null;
 
     return (
         <div className="flex flex-col h-screen bg-black overflow-hidden">
@@ -44,7 +86,7 @@ export default function CoursePlayerPage() {
                         </Button>
                     </Link>
                     <div className="flex flex-col">
-                        <h1 className="text-sm font-semibold truncate max-w-[300px]">Advanced React Patterns & Performance</h1>
+                        <h1 className="text-sm font-semibold truncate max-w-[300px]">{course.title}</h1>
                         <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                             <Progress value={25} className="h-1 w-20" />
                             <span>25% Complete</span>
@@ -62,7 +104,10 @@ export default function CoursePlayerPage() {
                 <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
                     <div className="flex-1 relative aspect-video bg-black flex items-center justify-center group">
                         {/* Simulated Video Player */}
-                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1600&auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 blur-sm" />
+                        <div
+                            className="absolute inset-0 bg-cover bg-center opacity-40 blur-sm"
+                            style={{ backgroundImage: `url(${course.thumbnail || 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1600&auto=format&fit=crop&q=80'})` }}
+                        />
                         <div className="relative z-10 text-center space-y-4">
                             <div className="h-20 w-20 rounded-full bg-accent-vibrant/20 border border-accent-vibrant/50 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                                 <Play className="h-8 w-8 text-white fill-current translate-x-1" />
@@ -93,7 +138,7 @@ export default function CoursePlayerPage() {
                             <TabsContent value="overview" className="space-y-4 pt-4">
                                 <h3 className="text-lg font-bold">About this lesson</h3>
                                 <p className="text-sm text-muted-foreground leading-relaxed">
-                                    In this modules, Sarah Drasner deep dives into why React Server Components are the biggest shift in React&apos;s philosophy since Hooks. We&apos;ll explore the mental model of mixing Client and Server components without losing performance.
+                                    {course.description}
                                 </p>
                             </TabsContent>
                             <TabsContent value="notes" className="space-y-4 pt-4">
@@ -122,7 +167,7 @@ export default function CoursePlayerPage() {
                         <BookOpen className="h-4 w-4" /> Course Content
                     </div>
                     <div className="flex-1 overflow-y-auto">
-                        {lessons.map((lesson) => (
+                        {lessons.map((lesson: any) => (
                             <div
                                 key={lesson.id}
                                 onClick={() => setCurrentLesson(lesson.id)}

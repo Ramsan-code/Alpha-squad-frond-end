@@ -1,19 +1,23 @@
 import { api, ApiResponse } from "@/lib/api-client";
-import { User, UserRole } from "@/types/user";
+import { User } from "@/types/user";
+import { UserProfile } from "@/types/profile";
 
 // DTO types matching backend response structure
 export type LoginResponse = ApiResponse<{
     user: User;
+    profile: UserProfile;
     token: string;
 }>;
 
 export type RegisterResponse = ApiResponse<{
     user: User;
+    profile: UserProfile;
     token: string;
 }>;
 
 export type MeResponse = ApiResponse<{
     user: User;
+    profile: UserProfile;
 }>;
 
 // Auth service - all backend communication for authentication
@@ -76,7 +80,7 @@ export const authService = {
     /**
      * Get current user profile (requires auth token)
      */
-    async getMe(token: string): Promise<MeResponse> {
+    async getMe(): Promise<MeResponse> {
         return api.get<MeResponse>("/auth/me");
     },
 };

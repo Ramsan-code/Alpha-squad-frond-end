@@ -26,7 +26,7 @@ export function AppLayoutWrapper({
     React.useEffect(() => {
         if (!isLoading && mounted) {
             const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password");
-            const isPublicPage = pathname === "/" || pathname.startsWith("/demo") || isAuthPage;
+            const isPublicPage = pathname === "/" || pathname === "/search" || pathname.startsWith("/demo") || isAuthPage;
 
             if (!isAuthenticated && !isPublicPage) {
                 router.push("/login");
@@ -46,8 +46,8 @@ export function AppLayoutWrapper({
         </div>;
     }
 
-    // Hide sidebar on landing, auth and demo pages
-    const hideSidebar = pathname === "/" || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/demo");
+    // Hide sidebar on landing, search (for guests), auth and demo pages
+    const hideSidebar = pathname === "/" || (!isAuthenticated && pathname === "/search") || pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/demo");
 
     if (hideSidebar) {
         return (

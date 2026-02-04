@@ -78,7 +78,6 @@ const achievements = [
 export default function AnalyticsPage() {
     const { user } = useAuth();
     const [mounted, setMounted] = React.useState(false);
-    const [, setTimeRange] = React.useState("week");
 
     React.useEffect(() => {
         setMounted(true);
@@ -99,7 +98,7 @@ export default function AnalyticsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Tabs defaultValue="week" onValueChange={setTimeRange}>
+                    <Tabs defaultValue="week">
                         <TabsList className="bg-white/5 border border-white/10 p-1">
                             <TabsTrigger value="week" className="text-[10px]">This Week</TabsTrigger>
                             <TabsTrigger value="month" className="text-[10px]">This Month</TabsTrigger>

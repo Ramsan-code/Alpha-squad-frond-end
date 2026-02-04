@@ -13,50 +13,46 @@ import { useAuth } from "@/components/auth/auth-provider"
 export default function StudentDashboard() {
     const { user } = useAuth();
 
-    const stats = {
-        coursesEnrolled: 8,
-        coursesCompleted: 3,
-        hoursLearned: 127,
-        certificatesEarned: 3,
-        currentStreak: 20,
-        weeklyGoal: 75,
-    }
+    // Map backend data to dashboard format
+    const dashboardData = React.useMemo(() => {
+        if (!user?.profile?.enrolledCourses) {
+            return { stats: { coursesEnrolled: 0, coursesCompleted: 0, hoursLearned: 0, certificatesEarned: 0, currentStreak: 0, weeklyGoal: 0 }, activeCourses: [] };
+        }
 
-    const activeCourses = [
-        {
-            id: 1,
-            title: "Advanced React Patterns & Performance",
-            progress: 67,
-            instructor: "Dr. Sarah Chen",
-            instructorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
-            nextLesson: "Custom Hooks Deep Dive",
-            thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop",
-            category: "Development",
-            rating: 4.9,
-        },
-        {
-            id: 2,
-            title: "AI Integration for Modern Apps",
-            progress: 34,
-            instructor: "Dr. Michael Chen",
-            instructorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-            nextLesson: "Building RAG Systems",
-            thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=200&fit=crop",
-            category: "AI/ML",
-            rating: 4.95,
-        },
-        {
-            id: 3,
-            title: "Cloud Architecture Masterclass",
-            progress: 89,
-            instructor: "Emma Williams",
-            instructorAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100",
-            nextLesson: "Final Project Review",
-            thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=200&fit=crop",
-            category: "Cloud",
-            rating: 4.8,
-        },
-    ]
+        const enrolled = user.profile.enrolledCourses;
+        const courses = enrolled.map((enrollment: any) => {
+            const course = enrollment.courseId;
+            if (!course) return null;
+            return {
+                id: course._id,
+                title: course.title,
+                progress: enrollment.progress || 0,
+                instructor: course.author || "Global Instructor",
+                instructorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(course.author || "GI")}&background=random`,
+                nextLesson: enrollment.progress < 100 ? "Continue Learning" : "Completed",
+                thumbnail: course.thumbnail || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop",
+                category: course.category || "General",
+                rating: 4.5,
+            };
+        }).filter(Boolean);
+
+        const completedCount = courses.filter((c: any) => c.progress === 100).length;
+        const totalHours = courses.reduce((acc: number, curr: any) => acc + (parseInt(curr.duration) || 10), 0);
+
+        return {
+            stats: {
+                coursesEnrolled: courses.length,
+                coursesCompleted: completedCount,
+                hoursLearned: totalHours,
+                certificatesEarned: completedCount,
+                currentStreak: 2, // Dummy for now
+                weeklyGoal: 75,
+            },
+            activeCourses: courses.filter((c: any) => c.progress < 100).slice(0, 3)
+        };
+    }, [user]);
+
+    const { stats, activeCourses } = dashboardData;
 
     const upcomingAssignments = [
         { id: 1, course: "Advanced React Patterns", title: "Build a Custom Hook Library", dueDate: "Feb 5, 2026", priority: "high", daysLeft: 3 },
@@ -140,7 +136,7 @@ export default function StudentDashboard() {
                     </div>
 
                     <div className="space-y-4">
-                        {activeCourses.map((course) => (
+                        {activeCourses.map((course: any) => (
                             <Card key={course.id} className="glass border-none overflow-hidden group hover:scale-[1.01] transition-all">
                                 <div className="flex flex-col sm:flex-row">
                                     <div className="relative w-full sm:w-48 h-32 shrink-0 overflow-hidden">
