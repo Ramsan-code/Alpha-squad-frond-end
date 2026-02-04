@@ -1,4 +1,4 @@
-import { api, ApiResponse } from "@/lib/api-client";
+import { api, ApiResponse } from "@/lib/api";
 import { User } from "@/types/user";
 import { UserProfile } from "@/types/profile";
 

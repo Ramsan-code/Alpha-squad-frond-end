@@ -9,17 +9,19 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
 import { useAuth } from "@/components/auth/auth-provider"
+import { isStudentProfile } from "@/types/profile"
 
 export default function StudentDashboard() {
     const { user } = useAuth();
 
     // Map backend data to dashboard format
     const dashboardData = React.useMemo(() => {
-        if (!user?.profile?.enrolledCourses) {
+        const profile = user?.profile;
+        if (!isStudentProfile(profile)) {
             return { stats: { coursesEnrolled: 0, coursesCompleted: 0, hoursLearned: 0, certificatesEarned: 0, currentStreak: 0, weeklyGoal: 0 }, activeCourses: [] };
         }
 
-        const enrolled = user.profile.enrolledCourses;
+        const enrolled = profile.enrolledCourses;
         const courses = enrolled.map((enrollment: any) => {
             const course = enrollment.courseId;
             if (!course) return null;

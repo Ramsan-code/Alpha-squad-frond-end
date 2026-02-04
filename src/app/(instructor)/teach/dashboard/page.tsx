@@ -7,17 +7,19 @@ import Link from "next/link"
 import Image from "next/image"
 import * as React from "react"
 import { useAuth } from "@/components/auth/auth-provider"
+import { isTeacherProfile } from "@/types/profile"
 
 export default function TeacherDashboard() {
     const { user } = useAuth();
 
     // Map backend data to dashboard format
     const dashboardData = React.useMemo(() => {
-        if (!user?.profile?.coursesCreated) {
+        const profile = user?.profile;
+        if (!isTeacherProfile(profile)) {
             return { stats: { totalRevenue: 0, totalStudents: 0, activeCourses: 0, avgRating: 0 }, teacherCourses: [] };
         }
 
-        const created = user.profile.coursesCreated;
+        const created = profile.coursesCreated;
         const mappedCourses = created.map((course: any) => {
             const studentCount = course.enrolledStudents?.length || 0;
             return {

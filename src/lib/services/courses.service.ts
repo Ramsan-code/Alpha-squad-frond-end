@@ -1,4 +1,4 @@
-import { api, ApiResponse } from "@/lib/api-client";
+import { api, ApiResponse } from "@/lib/api";
 
 // Course DTOs matching backend
 export interface Course {

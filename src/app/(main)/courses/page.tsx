@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
+import { isStudentProfile } from "@/types/profile";
 
 // No mock data needed anymore, using real data from useAuth()
 
@@ -21,9 +22,10 @@ export default function MyCoursesPage() {
 
     // Map backend enrolled courses to UI format
     const courses = React.useMemo(() => {
-        if (!user?.profile?.enrolledCourses) return [];
+        const profile = user?.profile;
+        if (!isStudentProfile(profile)) return [];
 
-        return user.profile.enrolledCourses.map((enrollment: any) => {
+        return profile.enrolledCourses.map((enrollment: any) => {
             const course = enrollment.courseId;
             if (!course) return null;
 
