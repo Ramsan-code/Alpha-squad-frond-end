@@ -136,9 +136,6 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/5 text-center text-muted-foreground text-sm">
-        <p>© 2026 Alpha.LMS Platform. Built for the Next Generation of Learners.</p>
-      </footer>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 export function SiteFooter() {
     return (
         <footer className="w-full border-t border-white/10 bg-background pt-16 pb-8">
-            <div className="container px-4 md:px-6">
+            <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
                     {/* Brand Column */}
                     <div className="space-y-4">
