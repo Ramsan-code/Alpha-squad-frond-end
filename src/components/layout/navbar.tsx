@@ -2,21 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Zap, Menu, X, ChevronDown, GraduationCap, Users, ShieldCheck, BookOpen } from "lucide-react"
+import { Zap, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
-    const pathname = usePathname()
     const [isScrolled, setIsScrolled] = React.useState(false)
 
     React.useEffect(() => {
@@ -26,40 +18,6 @@ export function Navbar() {
         window.addEventListener("scroll", handleScroll)
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
-
-    // Do not render navbar on dashboard or auth pages if they have their own layout (optional check)
-    // For now, we assume this is used in the Marketing layout
-
-    const features = [
-        {
-            title: "For Students",
-            description: "Personalized AI learning paths",
-            href: "/register/student",
-            icon: GraduationCap,
-            color: "text-accent-vibrant",
-        },
-        {
-            title: "For Instructors",
-            description: "Create and monetize courses",
-            href: "/register/teacher",
-            icon: Users,
-            color: "text-accent-cyan",
-        },
-        {
-            title: "Start Learning",
-            description: "Browse our course catalog",
-            href: "/login", // Placeholder
-            icon: BookOpen,
-            color: "text-green-500",
-        },
-        {
-            title: "Enterprise",
-            description: "Scale training globally",
-            href: "/compliance", // Placeholder
-            icon: ShieldCheck,
-            color: "text-amber-500",
-        },
-    ]
 
     return (
         <header
@@ -80,60 +38,6 @@ export function Navbar() {
                         Alpha.<span className="text-accent-vibrant">LMS</span>
                     </span>
                 </Link>
-
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="text-base font-medium text-muted-foreground hover:text-white"
-                            >
-                                Features <ChevronDown className="ml-1 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="center"
-                            className="w-[300px] glass border-white/10 p-2"
-                        >
-                            <div className="grid gap-2">
-                                {features.map((feature, index) => (
-                                    <DropdownMenuItem key={index} asChild>
-                                        <Link
-                                            href={feature.href}
-                                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer group"
-                                        >
-                                            <div className={`mt-1 h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center ${feature.color} group-hover:scale-110 transition-transform`}>
-                                                <feature.icon className="h-4 w-4" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-medium text-white leading-none">
-                                                    {feature.title}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground line-clamp-1">
-                                                    {feature.description}
-                                                </p>
-                                            </div>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                ))}
-                            </div>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <Link
-                        href="/coming-soon"
-                        className="text-sm font-medium text-muted-foreground hover:text-white transition-colors"
-                    >
-                        Demo
-                    </Link>
-                    <Link
-                        href="/coming-soon"
-                        className="text-sm font-medium text-muted-foreground hover:text-white transition-colors"
-                    >
-                        Pricing
-                    </Link>
-                </nav>
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-4">
@@ -165,20 +69,6 @@ export function Navbar() {
                                     </div>
                                     <span className="text-xl font-bold">Alpha.LMS</span>
                                 </Link>
-
-                                <div className="flex flex-col gap-4">
-                                    <div className="font-semibold text-lg text-white/50 px-2">Features</div>
-                                    {features.map((feature, index) => (
-                                        <Link
-                                            key={index}
-                                            href={feature.href}
-                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5"
-                                        >
-                                            <feature.icon className={`h-5 w-5 ${feature.color}`} />
-                                            <span className="font-medium">{feature.title}</span>
-                                        </Link>
-                                    ))}
-                                </div>
 
                                 <div className="h-px bg-white/10" />
 
