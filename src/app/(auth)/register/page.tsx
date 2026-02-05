@@ -39,7 +39,7 @@ export default function RegisterPage() {
                             <CardDescription>Enroll in courses and track your AI-driven skill growth.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Link href="/login">
+                            <Link href="/register/student">
                                 <Button className="w-full bg-accent-vibrant hover:bg-accent-vibrant/90 text-white">Register as Student</Button>
                             </Link>
                         </CardContent>
@@ -54,7 +54,7 @@ export default function RegisterPage() {
                             <CardDescription>Create courses and monetize your expertise globally.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Link href="/login">
+                            <Link href="/register/teacher">
                                 <Button className="w-full bg-accent-cyan hover:bg-accent-cyan/90 text-white">Register as Teacher</Button>
                             </Link>
                         </CardContent>

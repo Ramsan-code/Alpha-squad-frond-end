@@ -115,16 +115,11 @@ export function LoginForm() {
                 </form>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-                <div className="relative w-full">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-white/10" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-transparent px-2 text-muted-foreground">Demo Accounts</span>
-                    </div>
-                </div>
-                <div className="text-[10px] text-muted-foreground text-center">
-                    Simply enter any email and select a role to test the multi-role redirection.
+                <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                    Don&apos;t have an account?{" "}
+                    <Link href="/register" className="font-semibold text-accent-vibrant hover:underline hover:text-accent-vibrant/80 transition-colors">
+                        Create one
+                    </Link>
                 </div>
             </CardFooter>
         </Card>

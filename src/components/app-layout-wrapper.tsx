@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteFooter } from "@/components/site-footer";
 import { usePathname, useRouter } from "next/navigation";
@@ -63,6 +63,10 @@ export function AppLayoutWrapper({
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
+                <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/50 backdrop-blur-md px-4 lg:hidden sticky top-0 z-50">
+                    <SidebarTrigger />
+                    <span className="font-semibold">Alpha.LMS</span>
+                </header>
                 <main className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                     {children}
                 </main>

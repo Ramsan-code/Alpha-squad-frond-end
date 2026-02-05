@@ -38,12 +38,14 @@ export const authService = {
     async registerStudent(
         email: string,
         password: string,
-        name?: string
+        firstName: string,
+        lastName: string
     ): Promise<RegisterResponse> {
         return api.post<RegisterResponse>("/auth/register/student", {
             email,
             password,
-            name,
+            firstName,
+            lastName
         });
     },
 
@@ -53,12 +55,14 @@ export const authService = {
     async registerTeacher(
         email: string,
         password: string,
-        name?: string
+        firstName: string,
+        lastName: string
     ): Promise<RegisterResponse> {
         return api.post<RegisterResponse>("/auth/register/teacher", {
             email,
             password,
-            name,
+            firstName,
+            lastName
         });
     },
 

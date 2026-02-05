@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Navbar } from "@/components/layout/navbar";
 
 export default function LandingPage() {
   const roles = [
@@ -39,6 +40,7 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white selection:bg-accent-vibrant selection:text-white">
+      <Navbar />
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 mesh-gradient overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent-vibrant/20 blur-[120px] rounded-full opacity-50 -z-10" />
@@ -47,7 +49,7 @@ export default function LandingPage() {
           <Badge variant="outline" className="border-accent-vibrant/50 text-accent-vibrant px-4 py-1 rounded-full animate-fade-in">
             Next-Gen E-Learning Platform
           </Badge>
-          <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter leading-tight drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-8xl font-extrabold tracking-tighter leading-tight drop-shadow-2xl">
             Master the Future with <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-vibrant via-accent-cyan to-white">
               AI-Driven Learning
@@ -56,14 +58,14 @@ export default function LandingPage() {
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground leading-relaxed">
             The world&apos;s most advanced LMS for enterprise training, compliance, and individual upskilling. Scalable, personal, and profoundly effective.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-            <Link href="/dashboard">
-              <Button size="lg" className="h-14 px-8 bg-accent-vibrant hover:bg-accent-vibrant/90 text-white rounded-full text-lg font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <Link href="/dashboard" className="w-full sm:w-auto">
+              <Button size="lg" className="h-14 w-full sm:w-auto px-8 bg-accent-vibrant hover:bg-accent-vibrant/90 text-white rounded-full text-lg font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
                 Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/demo/classroom">
-              <Button variant="outline" size="lg" className="h-14 px-8 glass border-white/20 rounded-full text-lg font-medium hover:bg-white/5 transition-all">
+            <Link href="/demo/classroom" className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="h-14 w-full sm:w-auto px-8 glass border-white/20 rounded-full text-lg font-medium hover:bg-white/5 transition-all">
                 Watch Demo
               </Button>
             </Link>
@@ -78,7 +80,7 @@ export default function LandingPage() {
           <p className="text-muted-foreground max-w-xl mx-auto">Whether you&apos;re a lifelong learner or a global enterprise admin, we have the tools you need.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {roles.map((role) => (
             <Card key={role.title} className="glass border-white/10 hover:border-accent-vibrant/50 transition-all group cursor-pointer hover:-translate-y-2">
               <CardHeader>

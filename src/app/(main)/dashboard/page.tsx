@@ -146,7 +146,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-5">
                 {[
                     { label: "Courses Enrolled", value: stats.coursesEnrolled, sub: `${stats.coursesCompleted} completed`, icon: BookOpen, color: "text-accent-vibrant" },
                     { label: "Hours Learned", value: `${stats.hoursLearned}h`, sub: "+12h this week", icon: Clock, color: "text-accent-cyan" },
