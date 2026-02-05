@@ -9,6 +9,8 @@ import { Loader2, CheckCircle2, AlertCircle, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { Progress } from "@/components/ui/progress"
 
+import { api } from "@/lib/api/client"
+
 interface GradingResult {
     score: number
     feedback: string
@@ -33,19 +35,12 @@ export function AutomatedGrader() {
         setResult(null)
 
         try {
-            const response = await fetch("/api/ai/grade", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    assignmentDescription: formData.description,
-                    studentSubmission: formData.submission,
-                }),
+            const response = await api.post<any>("/ai/grade", {
+                assignmentDescription: formData.description,
+                studentSubmission: formData.submission,
             })
 
-            if (!response.ok) throw new Error("Failed to grade submission")
-
-            const data = await response.json()
-            setResult(data)
+            setResult(response.data || response) // API client might return data directly or wrapped
             toast.success("Grading completed!")
         } catch (error) {
             console.error(error)

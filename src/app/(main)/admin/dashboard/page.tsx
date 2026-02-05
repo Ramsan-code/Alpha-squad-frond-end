@@ -1,10 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, BookOpen, DollarSign, TrendingUp, Activity, AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { Users, BookOpen, DollarSign, TrendingUp, Activity, CheckCircle, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { toast } from "sonner"
+import { adminService, PendingUser } from "@/lib/services/admin.service"
 import {
     AreaChart,
     Area,
@@ -16,14 +19,66 @@ import {
 } from "recharts"
 
 export default function AdminDashboard() {
-    // Mock data - replace with real data from API
+    const [isLoading, setIsLoading] = useState(true);
+    const [pendingStudents, setPendingStudents] = useState<PendingUser[]>([]);
+    const [pendingTeachers, setPendingTeachers] = useState<PendingUser[]>([]);
+
+    const fetchPendingApprovals = async () => {
+        try {
+            const response = await adminService.getPendingApprovals();
+            if (response.success && response.data) {
+                setPendingStudents(response.data.students || []);
+                setPendingTeachers(response.data.teachers || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch pending approvals:", error);
+            toast.error("Failed to load pending approvals");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchPendingApprovals();
+    }, []);
+
+    const handleApprove = async (id: string, role: 'student' | 'teacher') => {
+        try {
+            if (role === 'student') {
+                await adminService.approveStudent(id);
+            } else {
+                await adminService.approveTeacher(id);
+            }
+            toast.success(`${role === 'student' ? 'Student' : 'Instructor'} approved successfully`);
+            fetchPendingApprovals();
+        } catch (error) {
+            toast.error("Failed to approve user");
+            console.error(error);
+        }
+    };
+
+    const handleReject = async (id: string, role: 'student' | 'teacher') => {
+        try {
+            if (role === 'student') {
+                await adminService.rejectStudent(id, "Admin rejected");
+            } else {
+                await adminService.rejectTeacher(id, "Admin rejected");
+            }
+            toast.success(`${role === 'student' ? 'Student' : 'Instructor'} rejected`);
+            fetchPendingApprovals();
+        } catch (error) {
+            toast.error("Failed to reject user");
+            console.error(error);
+        }
+    };
+
+    // Mock stats for display only - in real app, these would come from an analytics endpoint
     const stats = {
         totalUsers: 15847,
         totalCourses: 342,
         totalRevenue: 487650,
         activeUsers: 8923,
         newUsersThisMonth: 1247,
-        courseCompletionRate: 67,
     }
 
     const userGrowth = [
@@ -36,41 +91,6 @@ export default function AdminDashboard() {
         { month: "Jul", users: 15680 },
         { month: "Aug", users: 15847 },
     ]
-
-    const recentUsers = [
-        { id: 1, name: "John Doe", email: "john@example.com", role: "STUDENT", status: "active", joined: "2 hours ago" },
-        { id: 2, name: "Sarah Johnson", email: "sarah@example.com", role: "INSTRUCTOR", status: "active", joined: "5 hours ago" },
-        { id: 3, name: "Mike Chen", email: "mike@example.com", role: "STUDENT", status: "pending", joined: "1 day ago" },
-        { id: 4, name: "Emma Wilson", email: "emma@example.com", role: "PARENT", status: "active", joined: "2 days ago" },
-    ]
-
-
-
-    const systemHealth = [
-        { metric: "API Response Time", value: "124ms", status: "good", percentage: 95 },
-        { metric: "Database Performance", value: "98%", status: "good", percentage: 98 },
-        { metric: "Storage Usage", value: "67%", status: "warning", percentage: 67 },
-        { metric: "Active Sessions", value: "8,923", status: "good", percentage: 85 },
-    ]
-
-    const topCourses = [
-        { id: 1, title: "Machine Learning Fundamentals", students: 2847, revenue: 71175, rating: 4.8 },
-        { id: 2, title: "Advanced React Patterns", students: 2134, rating: 4.9, revenue: 53350 },
-        { id: 3, title: "Full Stack Web Development", students: 1923, revenue: 48075, rating: 4.7 },
-    ]
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case "good":
-                return <CheckCircle className="h-4 w-4 text-green-500" />
-            case "warning":
-                return <AlertCircle className="h-4 w-4 text-amber-500" />
-            case "error":
-                return <XCircle className="h-4 w-4 text-red-500" />
-            default:
-                return <Activity className="h-4 w-4 text-muted-foreground" />
-        }
-    }
 
     return (
         <div className="container mx-auto p-6 space-y-8">
@@ -97,13 +117,15 @@ export default function AdminDashboard() {
 
                 <Card className="glass border-white/10">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+                        <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
                         <BookOpen className="h-4 w-4 text-accent-cyan" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalCourses}</div>
+                        <div className="text-2xl font-bold">
+                            {pendingStudents.length + pendingTeachers.length}
+                        </div>
                         <p className="text-xs text-muted-foreground">
-                            3 pending approval
+                            Requires action
                         </p>
                     </CardContent>
                 </Card>
@@ -135,95 +157,106 @@ export default function AdminDashboard() {
                 </Card>
             </div>
 
-            {/* System Health */}
-            <Card className="glass border-white/10">
-                <CardHeader>
-                    <CardTitle>System Health</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        {systemHealth.map((item) => (
-                            <div key={item.metric} className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium">{item.metric}</span>
-                                    {getStatusIcon(item.status)}
-                                </div>
-                                <div className="text-2xl font-bold">{item.value}</div>
-                                <Progress value={item.percentage} className="h-2" />
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
             <div className="grid gap-6 lg:grid-cols-2">
-                {/* Recent Users */}
-                <Card className="glass border-white/10">
+                {/* Pending Approvals Section */}
+                <Card className="glass border-white/10 lg:col-span-2">
                     <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle>Recent Users</CardTitle>
-                            <Button variant="ghost" size="sm">View All</Button>
-                        </div>
+                        <CardTitle>Pending Approvals</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            {recentUsers.map((user) => (
-                                <div key={user.id} className="flex items-center justify-between pb-4 border-b border-white/10 last:border-0 last:pb-0">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-semibold text-sm">{user.name}</p>
-                                            <Badge variant="outline" className="text-xs">
-                                                {user.role}
-                                            </Badge>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                        <Tabs defaultValue="students" className="w-full">
+                            <TabsList className="bg-white/5 border border-white/10">
+                                <TabsTrigger value="students">Students ({pendingStudents.length})</TabsTrigger>
+                                <TabsTrigger value="teachers">Instructors ({pendingTeachers.length})</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="students" className="mt-4">
+                                {pendingStudents.length === 0 ? (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        No pending student approvals
                                     </div>
-                                    <div className="text-right space-y-1">
-                                        <Badge
-                                            variant={user.status === "active" ? "default" : "secondary"}
-                                            className={user.status === "active" ? "bg-green-500/10 text-green-500" : ""}
-                                        >
-                                            {user.status}
-                                        </Badge>
-                                        <p className="text-xs text-muted-foreground">{user.joined}</p>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {pendingStudents.map((student) => (
+                                            <div key={student._id} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-semibold">{student.firstName} {student.lastName}</p>
+                                                        <Badge variant="outline" className="text-xs bg-accent-vibrant/10 text-accent-vibrant border-accent-vibrant/20">
+                                                            Student
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground">{student.userId.email}</p>
+                                                    <p className="text-xs text-muted-foreground">Grade: {student.gradeLevel}</p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                                        onClick={() => handleReject(student._id, 'student')}
+                                                    >
+                                                        <XCircle className="h-4 w-4 mr-1" /> Reject
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                                        onClick={() => handleApprove(student._id, 'student')}
+                                                    >
+                                                        <CheckCircle className="h-4 w-4 mr-1" /> Approve
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                )}
+                            </TabsContent>
+
+                            <TabsContent value="teachers" className="mt-4">
+                                {pendingTeachers.length === 0 ? (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        No pending instructor approvals
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {pendingTeachers.map((teacher) => (
+                                            <div key={teacher._id} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-semibold">{teacher.firstName} {teacher.lastName}</p>
+                                                        <Badge variant="outline" className="text-xs bg-accent-cyan/10 text-accent-cyan border-accent-cyan/20">
+                                                            Instructor
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground">{teacher.userId.email}</p>
+                                                    <p className="text-xs text-muted-foreground">Spec: {teacher.specialization} • Exp: {teacher.experience} yrs</p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                                        onClick={() => handleReject(teacher._id, 'teacher')}
+                                                    >
+                                                        <XCircle className="h-4 w-4 mr-1" /> Reject
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                                        onClick={() => handleApprove(teacher._id, 'teacher')}
+                                                    >
+                                                        <CheckCircle className="h-4 w-4 mr-1" /> Approve
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
                 </Card>
-
-
             </div>
-
-            {/* Top Performing Courses */}
-            <Card className="glass border-white/10">
-                <CardHeader>
-                    <CardTitle>Top Performing Courses</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {topCourses.map((course, index) => (
-                            <div key={course.id} className="flex items-center gap-4 pb-4 border-b border-white/10 last:border-0 last:pb-0">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-vibrant/10 text-accent-vibrant font-bold">
-                                    #{index + 1}
-                                </div>
-                                <div className="flex-1 space-y-1">
-                                    <p className="font-semibold">{course.title}</p>
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                        <span>{course.students.toLocaleString()} students</span>
-                                        <span>⭐ {course.rating}</span>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-bold text-green-500">${course.revenue.toLocaleString()}</p>
-                                    <p className="text-xs text-muted-foreground">revenue</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
 
             {/* User Growth Trend */}
             <Card className="glass border-white/10">

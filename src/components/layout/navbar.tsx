@@ -122,13 +122,13 @@ export function Navbar() {
                     </DropdownMenu>
 
                     <Link
-                        href="/demo"
+                        href="/coming-soon"
                         className="text-sm font-medium text-muted-foreground hover:text-white transition-colors"
                     >
                         Demo
                     </Link>
                     <Link
-                        href="/pricing"
+                        href="/coming-soon"
                         className="text-sm font-medium text-muted-foreground hover:text-white transition-colors"
                     >
                         Pricing

@@ -64,7 +64,7 @@ export default function LandingPage() {
                 Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/demo/classroom" className="w-full sm:w-auto">
+            <Link href="/coming-soon" className="w-full sm:w-auto">
               <Button variant="outline" size="lg" className="h-14 w-full sm:w-auto px-8 glass border-white/20 rounded-full text-lg font-medium hover:bg-white/5 transition-all">
                 Watch Demo
               </Button>
