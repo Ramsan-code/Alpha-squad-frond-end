@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 
 import { AppLayoutWrapper } from "@/components/app-layout-wrapper";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -38,6 +39,7 @@ export default function RootLayout({
           </AppLayoutWrapper>
         </AuthProvider>
         <VisualEditsMessenger />
+        <Toaster />
       </body>
     </html>
   );

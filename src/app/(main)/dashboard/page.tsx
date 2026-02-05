@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
+import { toast } from "sonner"
 import { useAuth } from "@/components/auth/auth-provider"
 import { isStudentProfile } from "@/types/profile"
 
@@ -16,6 +17,44 @@ export default function StudentDashboard() {
 
     // Map backend data to dashboard format
     const dashboardData = React.useMemo(() => {
+        // ADMIN PREVIEW MODE: Inject mock data
+        if (user?.role?.trim().toUpperCase() === 'ADMIN') {
+            return {
+                stats: {
+                    coursesEnrolled: 3,
+                    coursesCompleted: 1,
+                    hoursLearned: 28,
+                    certificatesEarned: 1,
+                    currentStreak: 12,
+                    weeklyGoal: 85,
+                },
+                activeCourses: [
+                    {
+                        id: "mock-1",
+                        title: "Advanced React Patterns",
+                        progress: 65,
+                        instructor: "Sarah Drasner",
+                        instructorAvatar: "https://ui-avatars.com/api/?name=SD&background=random",
+                        nextLesson: "Compound Components",
+                        thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop",
+                        category: "Frontend",
+                        rating: 4.8
+                    },
+                    {
+                        id: "mock-2",
+                        title: "System Design for Scale",
+                        progress: 42,
+                        instructor: "Alex Xu",
+                        instructorAvatar: "https://ui-avatars.com/api/?name=AX&background=random",
+                        nextLesson: "Load Balancing Strategy",
+                        thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=200&fit=crop",
+                        category: "Backend",
+                        rating: 4.9
+                    }
+                ]
+            };
+        }
+
         const profile = user?.profile;
         if (!isStudentProfile(profile)) {
             return { stats: { coursesEnrolled: 0, coursesCompleted: 0, hoursLearned: 0, certificatesEarned: 0, currentStreak: 0, weeklyGoal: 0 }, activeCourses: [] };
@@ -74,22 +113,35 @@ export default function StudentDashboard() {
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
                         <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-accent-vibrant to-accent-cyan">
-                            Welcome back, {user?.name?.split(' ')[0] || "Learner"}!
+                            {user?.role?.trim().toUpperCase() === 'ADMIN' ? "Student View" : `Welcome back, ${user?.name?.split(' ')[0] || "Learner"}!`}
                         </h1>
-                        <Badge className="bg-accent-vibrant/10 text-accent-vibrant border-accent-vibrant/20">
-                            <Flame className="h-3 w-3 mr-1" /> {stats.currentStreak} day streak
-                        </Badge>
+                        {user?.role?.trim().toUpperCase() === 'ADMIN' && <Badge variant="outline" className="text-accent-vibrant border-accent-vibrant">Admin Preview</Badge>}
+                        {user?.role?.trim().toUpperCase() !== 'ADMIN' && (
+                            <Badge className="bg-accent-vibrant/10 text-accent-vibrant border-accent-vibrant/20">
+                                <Flame className="h-3 w-3 mr-1" /> {stats.currentStreak} day streak
+                            </Badge>
+                        )}
                     </div>
                     <p className="text-muted-foreground">Continue your learning journey and reach your goals.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" className="glass border-white/10 relative">
+                    <Button
+                        variant="outline"
+                        className="glass border-white/10 relative"
+                        onClick={() => {
+                            toast.info("Notification Center", {
+                                description: "You have 3 new updates: 'Advanced React' assignment due, and 2 new AI recommendations."
+                            });
+                        }}
+                    >
                         <Bell className="h-4 w-4" />
                         <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-[8px] flex items-center justify-center">3</span>
                     </Button>
-                    <Button className="bg-accent-vibrant hover:bg-accent-vibrant/90 text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-                        <Play className="h-4 w-4 mr-2 fill-current" /> Resume Learning
-                    </Button>
+                    <Link href={activeCourses.length > 0 ? `/courses/${activeCourses[0]?.id}` : "/courses"}>
+                        <Button className="bg-accent-vibrant hover:bg-accent-vibrant/90 text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                            <Play className="h-4 w-4 mr-2 fill-current" /> Resume Learning
+                        </Button>
+                    </Link>
                 </div>
             </div>
 

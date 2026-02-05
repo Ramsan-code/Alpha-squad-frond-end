@@ -19,9 +19,80 @@ export default function MyCoursesPage() {
     const { user } = useAuth();
     const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
     const [filter, setFilter] = React.useState("all");
+    const [searchTerm, setSearchTerm] = React.useState("");
 
     // Map backend enrolled courses to UI format
     const courses = React.useMemo(() => {
+        // ADMIN PREVIEW: Inject Mock Data
+        if (user?.role?.trim().toUpperCase() === 'ADMIN') {
+            return [
+                {
+                    id: "mock-1",
+                    title: "Advanced React Patterns",
+                    instructor: "Sarah Drasner",
+                    instructorAvatar: "https://ui-avatars.com/api/?name=SD&background=random",
+                    progress: 65,
+                    lastAccessed: new Date().toLocaleDateString(),
+                    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60",
+                    rating: 4.8,
+                    totalLessons: 45,
+                    completedLessons: 29,
+                    duration: "12h",
+                    category: "Frontend",
+                    nextLesson: "Compound Components",
+                    certified: false,
+                },
+                {
+                    id: "mock-2",
+                    title: "System Design for Scale",
+                    instructor: "Alex Xu",
+                    instructorAvatar: "https://ui-avatars.com/api/?name=AX&background=random",
+                    progress: 42,
+                    lastAccessed: new Date(Date.now() - 86400000).toLocaleDateString(),
+                    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=60",
+                    rating: 4.9,
+                    totalLessons: 60,
+                    completedLessons: 25,
+                    duration: "15h",
+                    category: "Backend",
+                    nextLesson: "Load Balancing Strategy",
+                    certified: false,
+                },
+                {
+                    id: "mock-3",
+                    title: "Introduction to Generative AI",
+                    instructor: "Andrew Ng",
+                    instructorAvatar: "https://ui-avatars.com/api/?name=AN&background=random",
+                    progress: 100,
+                    lastAccessed: "1/15/2026",
+                    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=60",
+                    rating: 5.0,
+                    totalLessons: 20,
+                    completedLessons: 20,
+                    duration: "6h",
+                    category: "AI/ML",
+                    nextLesson: null,
+                    certified: true,
+                },
+                {
+                    id: "mock-4",
+                    title: "UI/UX Principles 2026",
+                    instructor: "Gary Vaynerchuk",
+                    instructorAvatar: "https://ui-avatars.com/api/?name=GV&background=random",
+                    progress: 0,
+                    lastAccessed: "Never",
+                    image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d4f?w=800&auto=format&fit=crop&q=60",
+                    rating: 4.7,
+                    totalLessons: 35,
+                    completedLessons: 0,
+                    duration: "10h",
+                    category: "Design",
+                    nextLesson: "Course Introduction",
+                    certified: false,
+                }
+            ];
+        }
+
         const profile = user?.profile;
         if (!isStudentProfile(profile)) return [];
 
@@ -32,6 +103,7 @@ export default function MyCoursesPage() {
             return {
                 id: course._id,
                 title: course.title,
+                title_clean: course.title,
                 instructor: course.author || "Global Instructor",
                 instructorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(course.author || "GI")}&background=random`,
                 progress: enrollment.progress || 0,
@@ -48,11 +120,23 @@ export default function MyCoursesPage() {
         }).filter(Boolean);
     }, [user]);
 
-    const filteredCourses = filter === "all"
-        ? courses
-        : filter === "inProgress"
-            ? courses.filter((c: any) => c.progress > 0 && c.progress < 100)
-            : courses.filter((c: any) => c.progress === 100);
+    const filteredCourses = React.useMemo(() => {
+        return courses.filter((course: any) => {
+            // Filter by status (tab)
+            const matchesStatus =
+                filter === "all" ||
+                (filter === "inProgress" && course.progress > 0 && course.progress < 100) ||
+                (filter === "completed" && course.progress === 100);
+
+            // Filter by search term
+            const matchesSearch =
+                course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                course.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+            return matchesStatus && matchesSearch;
+        });
+    }, [courses, filter, searchTerm]);
 
     const stats = {
         totalCourses: courses.length,
@@ -67,16 +151,23 @@ export default function MyCoursesPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                     <h2 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-accent-vibrant to-accent-cyan">
-                        My Learning Library
+                        {user?.role?.trim().toUpperCase() === 'ADMIN' ? "Student View: My Courses" : "My Learning Library"}
                     </h2>
                     <p className="text-muted-foreground">
-                        Welcome back, <span className="text-white font-medium">{user?.name || "Learner"}</span>. Continue your journey.
+                        {user?.role?.trim().toUpperCase() === 'ADMIN'
+                            ? <span className="text-accent-vibrant font-medium">Admin Preview Mode</span>
+                            : <>Welcome back, <span className="text-white font-medium">{user?.name || "Learner"}</span>. Continue your journey.</>}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative w-64">
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Search courses..." className="pl-9 glass border-white/10 h-10" />
+                        <Input
+                            placeholder="Search courses..."
+                            className="pl-9 glass border-white/10 h-10"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
                     <Button variant="outline" className="glass border-white/10 h-10">
                         <Filter className="h-4 w-4 mr-2" /> Filter

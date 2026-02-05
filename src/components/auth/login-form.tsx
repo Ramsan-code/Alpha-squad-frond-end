@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Mail, Lock } from "lucide-react"
+import { Loader2, Mail, Lock, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -49,27 +49,31 @@ export function LoginForm() {
             <CardContent className="space-y-4">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="email" className="flex items-center gap-2 text-white/70">
+                            <Mail className="h-3 w-3" /> Email Address
+                        </Label>
+                        <div className="relative group">
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-accent-vibrant transition-colors" />
                             <Input
                                 id="email"
                                 placeholder="name@enterprise.com"
-                                className="pl-10 glass border-white/10"
+                                className="pl-10 glass border-white/10 focus:border-accent-vibrant/50 transition-all"
                                 {...register("email")}
                             />
                         </div>
                         {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="password" className="flex items-center gap-2 text-white/70">
+                            <Lock className="h-3 w-3" /> Password
+                        </Label>
+                        <div className="relative group">
+                            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-accent-vibrant transition-colors" />
                             <Input
                                 id="password"
                                 type="password"
                                 placeholder="••••••••"
-                                className="pl-10 glass border-white/10"
+                                className="pl-10 glass border-white/10 focus:border-accent-vibrant/50 transition-all"
                                 {...register("password")}
                             />
                         </div>
@@ -96,10 +100,17 @@ export function LoginForm() {
                     </div>
                     <Button
                         type="submit"
-                        className="w-full bg-accent-vibrant hover:bg-accent-vibrant/90 text-white transition-all font-bold"
+                        className="w-full bg-accent-vibrant hover:bg-accent-vibrant/90 text-white transition-all font-bold group"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign In"}
+                        {isSubmitting ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <>
+                                <CheckCircle2 className="mr-2 h-4 w-4 opacity-0 group-hover:opacity-100 -ml-2 transition-all" />
+                                <span>Sign In to Account</span>
+                            </>
+                        )}
                     </Button>
                 </form>
             </CardContent>

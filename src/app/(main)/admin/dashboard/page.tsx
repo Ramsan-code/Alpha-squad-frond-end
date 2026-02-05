@@ -1,9 +1,19 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, BookOpen, DollarSign, TrendingUp, Activity, AlertCircle, CheckCircle, XCircle } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-
 import { Badge } from "@/components/ui/badge"
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts"
 
 export default function AdminDashboard() {
     // Mock data - replace with real data from API
@@ -18,9 +28,13 @@ export default function AdminDashboard() {
 
     const userGrowth = [
         { month: "Jan", users: 12450 },
-        { month: "Feb", users: 13680 },
-        { month: "Mar", users: 14520 },
-        { month: "Apr", users: 15847 },
+        { month: "Feb", users: 13180 },
+        { month: "Mar", users: 13920 },
+        { month: "Apr", users: 14247 },
+        { month: "May", users: 14890 },
+        { month: "Jun", users: 15320 },
+        { month: "Jul", users: 15680 },
+        { month: "Aug", users: 15847 },
     ]
 
     const recentUsers = [
@@ -30,11 +44,7 @@ export default function AdminDashboard() {
         { id: 4, name: "Emma Wilson", email: "emma@example.com", role: "PARENT", status: "active", joined: "2 days ago" },
     ]
 
-    const pendingCourses = [
-        { id: 1, title: "Advanced Blockchain Development", instructor: "Dr. Alex Turner", submitted: "3 hours ago", status: "pending" },
-        { id: 2, title: "Quantum Computing Basics", instructor: "Prof. Lisa Chen", submitted: "1 day ago", status: "pending" },
-        { id: 3, title: "Ethical Hacking Masterclass", instructor: "James Rodriguez", submitted: "2 days ago", status: "under_review" },
-    ]
+
 
     const systemHealth = [
         { metric: "API Response Time", value: "124ms", status: "good", percentage: 95 },
@@ -183,46 +193,7 @@ export default function AdminDashboard() {
                     </CardContent>
                 </Card>
 
-                {/* Pending Course Approvals */}
-                <Card className="glass border-white/10">
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle>Pending Approvals</CardTitle>
-                            <span className="px-2 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full">
-                                {pendingCourses.length}
-                            </span>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {pendingCourses.map((course) => (
-                                <div key={course.id} className="p-4 rounded-lg bg-white/5 space-y-3">
-                                    <div className="space-y-1">
-                                        <p className="font-semibold text-sm">{course.title}</p>
-                                        <p className="text-xs text-muted-foreground">by {course.instructor}</p>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-muted-foreground">{course.submitted}</span>
-                                        <Badge variant="outline" className="text-xs">
-                                            {course.status.replace("_", " ")}
-                                        </Badge>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button size="sm" className="flex-1 bg-green-500 hover:bg-green-600">
-                                            Approve
-                                        </Button>
-                                        <Button size="sm" variant="outline" className="flex-1">
-                                            Review
-                                        </Button>
-                                        <Button size="sm" variant="destructive" className="flex-1">
-                                            Reject
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+
             </div>
 
             {/* Top Performing Courses */}
@@ -254,25 +225,55 @@ export default function AdminDashboard() {
                 </CardContent>
             </Card>
 
-            {/* User Growth Chart Placeholder */}
+            {/* User Growth Trend */}
             <Card className="glass border-white/10">
                 <CardHeader>
-                    <CardTitle>User Growth Trend</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-accent-vibrant" />
+                        User Growth Trend
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[300px] flex items-end justify-around gap-4">
-                        {userGrowth.map((data) => (
-                            <div key={data.month} className="flex-1 flex flex-col items-center gap-2">
-                                <div
-                                    className="w-full bg-gradient-to-t from-accent-vibrant to-accent-cyan rounded-t-lg transition-all hover:opacity-80"
-                                    style={{ height: `${(data.users / 16000) * 100}%` }}
+                    <div className="h-[300px] w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={userGrowth} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <XAxis
+                                    dataKey="month"
+                                    stroke="#888888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    dy={10}
                                 />
-                                <div className="text-center">
-                                    <p className="text-xs font-semibold">{data.month}</p>
-                                    <p className="text-xs text-muted-foreground">{data.users.toLocaleString()}</p>
-                                </div>
-                            </div>
-                        ))}
+                                <YAxis
+                                    stroke="#888888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    domain={['dataMin - 500', 'dataMax + 500']}
+                                    tickFormatter={(value) => `${(value / 1000).toFixed(1)}k`}
+                                />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#1a1b1e', borderColor: '#333', borderRadius: '8px' }}
+                                    itemStyle={{ color: '#fff' }}
+                                />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
+                                <Area
+                                    type="monotone"
+                                    dataKey="users"
+                                    stroke="#8b5cf6"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#growthGradient)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </CardContent>
             </Card>

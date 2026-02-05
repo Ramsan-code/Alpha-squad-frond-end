@@ -33,8 +33,9 @@ export function AppLayoutWrapper({
             }
 
             if (isAuthenticated && isAuthPage) {
-                if (user?.role === "INSTRUCTOR") router.push("/teach/dashboard");
-                else if (user?.role === "ADMIN") router.push("/admin/dashboard");
+                const role = user?.role?.trim().toUpperCase();
+                if (role === "INSTRUCTOR" || role === "TEACHER") router.push("/teach/dashboard");
+                else if (role === "ADMIN") router.push("/admin/dashboard");
                 else router.push("/dashboard");
             }
         }

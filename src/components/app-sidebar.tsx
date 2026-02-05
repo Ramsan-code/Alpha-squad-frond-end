@@ -10,6 +10,9 @@ import {
   TrendingUp,
   User,
   Zap,
+  Activity,
+  Eye,
+  LogOut,
 } from "lucide-react"
 
 import {
@@ -34,7 +37,10 @@ import { useAuth } from "@/components/auth/auth-provider"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, logout } = useAuth();
 
-  const role = user?.role || "STUDENT";
+  const role = (user?.role || "STUDENT").toLowerCase(); // Normalize role to lowercase for comparison if needed, or keep as is. API seems to return lowercase 'admin' based on previous context, but frontend logic uses uppercase. Let's stick to the convention used here effectively.
+
+  // Normalize role to uppercase to match the switch cases used below (INSTRUCTOR, PARENT)
+  const normalizedRole = user?.role?.toUpperCase() || "STUDENT";
 
   const data = {
     user: {
@@ -42,12 +48,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: user?.email || "guest@lms.ai",
       avatar: user?.avatar || "",
     },
-    navMain: role === "INSTRUCTOR" ? [
+    navMain: normalizedRole === "ADMIN" ? [
+      { title: "Admin Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
+      { title: "System Control", url: "/admin/system-control", icon: Activity },
+      { title: "Manage Users", url: "/admin/users", icon: User },
+      { title: "System Settings", url: "/admin/settings", icon: ShieldCheck },
+      { title: "Student View", url: "/dashboard", icon: Eye },
+      { title: "My Courses Preview", url: "/courses", icon: BookOpen },
+    ] : normalizedRole === "INSTRUCTOR" ? [
       { title: "Studio Home", url: "/teach/dashboard", icon: LayoutDashboard },
       { title: "My Courses", url: "/teach/courses", icon: BookOpen },
       { title: "Explore Catalog", url: "/search", icon: Search },
       { title: "Student Analytics", url: "/analytics", icon: LineChart },
-    ] : role === "PARENT" ? [
+    ] : normalizedRole === "PARENT" ? [
       { title: "Parent Home", url: "/parent/dashboard", icon: LayoutDashboard },
       { title: "Student Reports", url: "/parent/reports", icon: BookOpen },
       { title: "Explore Catalog", url: "/search", icon: Search },
@@ -57,12 +70,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { title: "Explore Catalog", url: "/search", icon: Search },
       { title: "My Courses", url: "/courses", icon: BookOpen },
     ],
-    insights: role === "INSTRUCTOR" ? [
+    insights: normalizedRole === "ADMIN" ? [
+      { title: "Platform Analytics", url: "/admin/analytics", icon: LineChart },
+      { title: "Audit Logs", url: "/admin/logs", icon: BookOpen },
+    ] : normalizedRole === "INSTRUCTOR" ? [
       { title: "Revenue", url: "/revenue", icon: TrendingUp },
       { title: "Lesson Planning", url: "/teach/planning", icon: BookOpen },
       { title: "Grading", url: "/teach/grading", icon: ShieldCheck },
       { title: "Content Builder", url: "/teach/courses/create", icon: Zap },
-    ] : role === "PARENT" ? [
+    ] : normalizedRole === "PARENT" ? [
       { title: "Progress Trends", url: "/analytics", icon: LineChart },
       { title: "AI Recommendations", url: "/ai-insights", icon: Zap },
     ] : [
@@ -87,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{role === "INSTRUCTOR" ? "Teaching" : "Learning"}</SidebarGroupLabel>
+          <SidebarGroupLabel>{normalizedRole === "INSTRUCTOR" ? "Teaching" : normalizedRole === "ADMIN" ? "Administration" : "Learning"}</SidebarGroupLabel>
           <SidebarMenu>
             {data.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
@@ -124,29 +140,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className="border-t border-white/10 p-4">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Profile" className="h-12 w-full justify-start p-0!">
+          <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuButton tooltip="Profile" className="h-12 flex-1 justify-start p-0! hover:bg-transparent">
               <div className="flex items-center gap-3 px-2 w-full">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted overflow-hidden">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted overflow-hidden shrink-0">
                   {user?.avatar ? <Image src={user.avatar} alt={data.user.name} width={32} height={32} className="h-full w-full object-cover" /> : <User className="h-4 w-4" />}
                 </div>
                 <div className="flex flex-col items-start text-xs group-data-[collapsible=icon]:hidden flex-1 truncate">
                   <span className="font-semibold truncate">{data.user.name}</span>
                   <span className="text-muted-foreground truncate">{data.user.email}</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 group-data-[collapsible=icon]:hidden hover:bg-red-500/10 hover:text-red-500"
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    logout();
-                  }}
-                >
-                  <ArrowRight className="h-3 w-3 rotate-180" />
-                </Button>
               </div>
             </SidebarMenuButton>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0 hover:bg-red-500/10 hover:text-red-500 transition-all"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+                logout();
+              }}
+              aria-label="Logout"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

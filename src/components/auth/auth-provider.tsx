@@ -63,8 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             toast.success(`Welcome back, ${userData.name}!`);
 
             // Navigate based on role
-            const role = userData.role;
-            if (role === "INSTRUCTOR") {
+            const role = userData.role?.trim().toUpperCase();
+            console.log("Redirecting for role:", role);
+
+            if (role === "INSTRUCTOR" || role === "TEACHER") {
                 router.push("/teach/dashboard");
             } else if (role === "ADMIN") {
                 router.push("/admin/dashboard");

@@ -13,11 +13,11 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex flex-col bg-black mesh-gradient">
             <div className="p-6">
-                <Link href="/">
-                    <Button variant="ghost" className="text-muted-foreground hover:text-white">
+                <Button variant="ghost" className="text-muted-foreground hover:text-white" asChild>
+                    <Link href="/">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
-                    </Button>
-                </Link>
+                    </Link>
+                </Button>
             </div>
             <div className="flex-1 flex flex-col items-center justify-center p-6 -mt-12">
                 <div className="mb-8 flex flex-col items-center">
